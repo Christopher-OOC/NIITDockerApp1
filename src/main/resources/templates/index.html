@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en" xmlns:th="www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Docker App</title>
+</head>
+<body>
+    <h1 style="text-align: center;">Introduction to Volumes in Docker!</h1>
+    <br/>
+    <div th:if="${success}">
+        <h2 th:text="${success}" style="color: green; text-align: center;"></h2>
+    </div>
+    <br/>
+    <form th:action="@{/submit}" method="POST" th:object="${message}">
+        <div>
+            <label>Title: </label>
+            <input type="text" th:field="*{title}"/>
+        </div>
+        <div>
+            <label>content: </label>
+            <input type="text" th:field="*{content}"/>
+        </div>
+        <button type="submit">Submit</button>
+    </form>
+
+    <br/>
+
+    <p th:if="${noContent}">[[${noContent}]]</p>
+
+    <div th:unless="${noContent}">
+        <table>
+            <thead>
+            <tr>
+                <th>Title</th>
+                <th>Content</th>
+            </tr>
+            </thead>
+            <tbody th:each="messageItem : ${messages}">
+            <tr>
+                <td>[[${messageItem.title}]]</td>
+                <td>[[${messageItem.content}]]</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</body>
+</html>
