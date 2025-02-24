@@ -14,7 +14,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @SpringBootApplication
 public class DockerAppApplication {
@@ -33,24 +32,30 @@ class DockerController {
 	public String homePage(Model model) throws IOException, ClassNotFoundException {
 		model.addAttribute("message", new Message());
 
-		File file = new File("C:/Users/Christopher-JavaLord/Downloads/DockerApp/src/main/resources/messages.txt");
+		File file = new File("C:/Users/Christopher-JavaLord/Downloads/DockerApp/src/main/resources/messages.dat");
 		List<Message> messageList = new ArrayList<>();
 
 		if (file.length() == 0) {
 			model.addAttribute("noContent", "No message");
 		}
 		else {
-			ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(file));
+			Message obj;
+				try(ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(file))) {
+					obj = (Message)inputStream.readObject();
+					while (obj != null) {
+						messageList.add(obj);
+						obj = (Message) inputStream.readObject();
+					}
+				}
+				catch (Exception ex) {
+					obj = null;
+				}
 
-
-			while (inputStream.available() != 0) {
-				System.out.println("Messages: " + inputStream.readObject());
-				messageList.add((Message) inputStream.readObject());
-			}
+			model.addAttribute("messages", messageList);
 		}
-		messageList.forEach(System.out::println);
 
-		model.addAttribute("messages", messageList);
+		System.out.println("Size: " + messageList.size());
+		messageList.forEach(System.out::println);
 
 		return "index";
 	}
@@ -63,48 +68,14 @@ class DockerController {
 		redirectAttributes.addFlashAttribute(  "success", "Your message is sent successfully!");
 
 		LOGGER.info("Your message, {}", message);
-		File file = new File("C:/Users/Christopher-JavaLord/Downloads/DockerApp/src/main/resources/messages.txt");
-		ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(file));
+		File file = new File("C:/Users/Christopher-JavaLord/Downloads/DockerApp/src/main/resources/messages.dat");
+		ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(file, true));
 		outputStream.writeObject(message);
+		outputStream.writeChars("\r\n");
+
+		outputStream.close();
 
 		return "redirect:/";
 	}
 }
 
-class Message implements Serializable {
-	private String title;
-	private String content;
-
-	public Message() {
-
-	}
-
-	public Message(String title, String content) {
-		this.title = title;
-		this.content = content;
-	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
-	}
-
-	public String getContent() {
-		return content;
-	}
-
-	public void setContent(String content) {
-		this.content = content;
-	}
-
-	@Override
-	public String toString() {
-		return "Message{" +
-				"title='" + title + '\'' +
-				", content='" + content + '\'' +
-				'}';
-	}
-}
