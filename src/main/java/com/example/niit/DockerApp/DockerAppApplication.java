@@ -14,6 +14,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 @SpringBootApplication
 public class DockerAppApplication {
@@ -26,36 +27,28 @@ public class DockerAppApplication {
 @Controller
 class DockerController {
 
+	List<Message> messageList = new ArrayList<>();
 	Logger LOGGER = LoggerFactory.getLogger(DockerController.class);
 
 	@GetMapping(value = "/")
 	public String homePage(Model model) throws IOException, ClassNotFoundException {
 		model.addAttribute("message", new Message());
+		//List<Message> messageList = new ArrayList<>();
 
-		File file = new File("C:/Users/Christopher-JavaLord/Downloads/DockerApp/src/main/resources/messages.dat");
-		List<Message> messageList = new ArrayList<>();
+//		File file =  new File("./hello.txt");
+//		Scanner scanner = new Scanner(file);
 
-		if (file.length() == 0) {
+//		while (scanner.hasNext()) {
+//			messageList.add(new Message(scanner.nextLine(), scanner.nextLine()));
+//		}
+//		scanner.close();
+
+		if (messageList.size() == 0) {
 			model.addAttribute("noContent", "No message");
 		}
 		else {
-			Message obj;
-				try(ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(file))) {
-					obj = (Message)inputStream.readObject();
-					while (obj != null) {
-						messageList.add(obj);
-						obj = (Message) inputStream.readObject();
-					}
-				}
-				catch (Exception ex) {
-					obj = null;
-				}
-
 			model.addAttribute("messages", messageList);
 		}
-
-		System.out.println("Size: " + messageList.size());
-		messageList.forEach(System.out::println);
 
 		return "index";
 	}
@@ -66,14 +59,13 @@ class DockerController {
 							  RedirectAttributes redirectAttributes) throws IOException {
 
 		redirectAttributes.addFlashAttribute(  "success", "Your message is sent successfully!");
-
-		LOGGER.info("Your message, {}", message);
-		File file = new File("C:/Users/Christopher-JavaLord/Downloads/DockerApp/src/main/resources/messages.dat");
-		ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(file, true));
-		outputStream.writeObject(message);
-		outputStream.writeChars("\r\n");
-
-		outputStream.close();
+//		File file =  new File("./hello.txt");
+//		PrintWriter writer = new PrintWriter(new FileOutputStream(file, true));
+//
+//		writer.println(message.getTitle());
+//		writer.println(message.getContent());
+//		writer.close();
+		messageList.add(new Message(message.getTitle(), message.getContent()));
 
 		return "redirect:/";
 	}

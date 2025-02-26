@@ -12,7 +12,7 @@ public class App {
         Message m2 = new Message("m2", "c2");
         Message m3 = new Message("m3", "c3");
 
-        File file = new File("C:/Users/Christopher-JavaLord/Downloads/DockerApp/src/main/resources/messages.dat");
+        File file = new File("C:/Users/Christopher-JavaLord/Downloads/DockerApp/src/main/resources/messages.txt");
         ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(file, true));
         outputStream.writeObject(m1);
         outputStream.writeObject(m2);
