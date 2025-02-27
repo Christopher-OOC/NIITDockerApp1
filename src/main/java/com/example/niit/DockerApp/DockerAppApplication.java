@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,21 +28,19 @@ public class DockerAppApplication {
 @Controller
 class DockerController {
 
-	List<Message> messageList = new ArrayList<>();
 	Logger LOGGER = LoggerFactory.getLogger(DockerController.class);
 
 	@GetMapping(value = "/")
 	public String homePage(Model model) throws IOException, ClassNotFoundException {
 		model.addAttribute("message", new Message());
-		//List<Message> messageList = new ArrayList<>();
+		List<Message> messageList = new ArrayList<>();
+		InputStream stream = new ClassPathResource("/data/messages.txt").getInputStream();
+		Scanner scanner = new Scanner(stream);
 
-//		File file =  new File("./hello.txt");
-//		Scanner scanner = new Scanner(file);
-
-//		while (scanner.hasNext()) {
-//			messageList.add(new Message(scanner.nextLine(), scanner.nextLine()));
-//		}
-//		scanner.close();
+		while (scanner.hasNext()) {
+			messageList.add(new Message(scanner.nextLine(), scanner.nextLine()));
+		}
+		scanner.close();
 
 		if (messageList.size() == 0) {
 			model.addAttribute("noContent", "No message");
@@ -59,13 +58,12 @@ class DockerController {
 							  RedirectAttributes redirectAttributes) throws IOException {
 
 		redirectAttributes.addFlashAttribute(  "success", "Your message is sent successfully!");
-//		File file =  new File("./hello.txt");
-//		PrintWriter writer = new PrintWriter(new FileOutputStream(file, true));
-//
-//		writer.println(message.getTitle());
-//		writer.println(message.getContent());
-//		writer.close();
-		messageList.add(new Message(message.getTitle(), message.getContent()));
+		File file = new ClassPathResource("/data/messages.txt").getFile();
+		PrintWriter writer = new PrintWriter(new FileOutputStream(file, true));
+
+		writer.println(message.getTitle());
+		writer.println(message.getContent());
+		writer.close();
 
 		return "redirect:/";
 	}
